@@ -1,0 +1,33 @@
+pipeline {
+    agent any
+    stages { 
+        stage('PULL') {
+            steps {
+                'git credentialsId: '98faf87c-6931-4df7-a086-319ff02cb61c', url: 'https://github.com/yogeshgadwar10/Assignment.git''
+
+            }
+        }
+        stage('DOCKER-IMAGE-BUILD') {
+            steps {
+                sh 'docker build . -t yogeshgadwar/hello-app:latest'
+            }
+        }
+        stage('PUSH-DOCKER-HUB') {
+            steps {
+               sh 'docker push yogeshgadwar/hello-app:latest'
+            }
+        }
+        stage('CLEAN') {
+            steps {
+                sh 'docker rmi -f yogeshgadwar/hello-app:latest'
+            }
+        }
+        stage('DEPLOY') {
+            steps {
+                 sh '''cd eks 
+                     kubectl apply -f .'''
+                 sh ''
+            }
+        }
+    }
+}
